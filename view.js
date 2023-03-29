@@ -1,8 +1,29 @@
 // ---- Define your dialogs  and panels here ----
+//make effective permission panel
+//define id_prefix
+let perm_id = "permfile";
+//define permission panel
+let permission_panel = define_new_effective_permissions(perm_id, add_info_col = true, which_permissions = null);
+//append the result to sidepanel
+$('#sidepanel').append(permission_panel);
+//apply filepath
+$('#permfile').attr('filepath', '/C/presentation_documents/important_file.txt');
 
+//add a user selector
+let user_id = "userfile";
+let user_selector = define_new_user_select_field(user_id, 'Select', on_user_change = function(selected_user){
+    //change username attribute of effective permission panel
+    $('#permfile').attr('username', selected_user);
+});
+//append user select field to sidepanel
+$('#sidepanel').append(user_selector);
 
 
 // ---- Display file structure ----
+
+//create dialog
+let dialog_id = "diafile";
+let dialog = define_new_dialog(dialog_id, title='Permission');
 
 // (recursively) makes and returns an html element (wrapped in a jquery object) for a given file object
 function make_file_element(file_obj) {
@@ -61,12 +82,39 @@ $('.permbutton').click( function( e ) {
     let path = e.currentTarget.getAttribute('path');
     perm_dialog.attr('filepath', path)
     perm_dialog.dialog('open')
-    //open_permissions_dialog(path)
 
     // Deal with the fact that folders try to collapse/expand when you click on their permissions button:
     e.stopPropagation() // don't propagate button click to element underneath it (e.g. folder accordion)
     // Emit a click for logging purposes:
     emitter.dispatchEvent(new CustomEvent('userEvent', { detail: new ClickEntry(ActionEnum.CLICK, (e.clientX + window.pageXOffset), (e.clientY + window.pageYOffset), e.target.id,new Date().getTime()) }))
+});
+
+//open dialog on click
+$('.perm_info').click( function(){
+    dialog.empty();
+
+    //file path
+    let filepath_log = $('#permfile').attr('filepath');
+    //console.log(filepath_log);
+    //username
+    let username_log = $('#permfile').attr('username');
+    //console.log(username_log);
+    //permission
+    let perm_log = $(this).attr('permission_name');
+    //console.log(perm_log);
+
+    //turn filepath to file object
+    let filepath_obj = path_to_file[filepath_log];
+    //turn username to user object
+    let username_obj = all_users[username_log];
+
+    //acquire explanation
+    let explanation = allow_user_action(filepath_obj, username_obj, perm_log, explain_why = true);
+    //turn it into a string
+    let explanation_str = get_explanation_text(explanation);
+
+    dialog.append(explanation_str);
+    dialog.dialog("open");
 });
 
 

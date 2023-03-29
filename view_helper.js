@@ -2,7 +2,6 @@
 // ---- Most functions have a required "id_prefix" parameter: you need to specify unique ids that will be used in the HTML, 
 // ---- so that we can tell from the logs what was actually clicked on.
 
-
 // --- helper functions for connecting things with events ---
 
 // define an observer which will call the passed on_attr_change function when the watched_attribute of watched_elem_selector 
